@@ -108,7 +108,11 @@ export async function askCopper(
 
       // A normal finish with no words still gets an answer.
       done(snapshot(steps, reply === "" ? APOLOGY : reply, "done"));
-    } catch {
+    } catch (cause) {
+      console.error(
+        "[ask-copper]",
+        cause instanceof Error ? cause.message : cause,
+      );
       done(snapshot(steps, reply === "" ? APOLOGY : reply, "error"));
     }
   })();

@@ -82,3 +82,32 @@ When a module changes how the app fits together, add a section here:
 **Risks and open questions:** cost, privacy, accuracy or safety risks, and how
 you handle them.
 ```
+
+## Module 2: Ask Copper
+
+**Summary:** A floating chat panel on the landing page where shoppers ask about
+prices, colors and stock. Copper answers with tools (code that reads the
+catalog and stock list) instead of guessing, and the panel shows each step.
+
+| Piece | Where | What it does |
+|---|---|---|
+| Page / route | `app/page.tsx` | Renders the panel and passes it `isAiConfigured()`. No new routes |
+| Components | `components/copper/ask-copper.tsx` | Launcher, side panel, tools on/off chats, stations and tool cards |
+| Server Action | `lib/copper/assistant/ask.ts` | `askCopper()` streams the question and returns a live `Progress` |
+| Tools | `lib/copper/assistant/tools.ts` | `get_products`, `get_prices`, `calculate_cost`, `check_availability` |
+| Instructions | `lib/copper/assistant/instructions.ts` | Copper's system prompt, sent only when tools are on |
+| Data | `lib/copper/data/inventory.json` | Stock list, read fresh by `readInventory()` |
+| AI calls | `lib/ai/call.ts` (module 2, `ask-copper`) | `callStream`, with thought summaries; up to 5 steps with tools |
+
+**Data flow:** shopper question → panel → `askCopper()` → `callStream` → model
+→ tool runs on the server (catalog / stock) → streamed `Progress` updates →
+panel redraws the stations and the reply.
+
+**Decisions and trade-offs:** Tools on and tools off are separate chats, so the
+tools-off model can't copy answers the tools worked out. Prices and stock are
+never typed into code or instructions; they come from the catalog and
+`readInventory()`. The Server Action returns right away and streams in the
+background so the panel can show progress.
+
+**Risks and open questions:** With tools off the model can invent prices (the
+panel labels this). Each question costs a model call, logged to `ai_calls`.

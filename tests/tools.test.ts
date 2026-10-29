@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   calculateCost,
   calculateCostInput,
@@ -7,6 +7,19 @@ import {
   getPrices,
   listProducts,
 } from "@/lib/copper/assistant/tools";
+
+// Stock lives in Supabase now. These tests check the tool's logic, not the
+// database, so they get the same six rows the seed file inserts.
+vi.mock("@/lib/copper/inventory", () => ({
+  readInventory: async () => [
+    { sku: "CH-POL", product: "Copper Home", color: "Polished Copper", units_in_stock: 240, next_shipment: "2026-11-20" },
+    { sku: "CH-TEA", product: "Copper Home", color: "Patina Teal", units_in_stock: 6, next_shipment: "2026-11-06" },
+    { sku: "CH-NSK", product: "Copper Home", color: "Night Sky", units_in_stock: 185, next_shipment: "2026-11-20" },
+    { sku: "CN-BRC", product: "Copper Notes", color: "Brushed Copper", units_in_stock: 310, next_shipment: "2026-11-13" },
+    { sku: "CN-DSA", product: "Copper Notes", color: "Desert Sand", units_in_stock: 92, next_shipment: "2026-11-13" },
+    { sku: "CN-NSK", product: "Copper Notes", color: "Night Sky", units_in_stock: 0, next_shipment: "2026-11-14" },
+  ],
+}));
 
 describe("Ask Copper tools", () => {
   it("adds Copper Plus once for the household", () => {

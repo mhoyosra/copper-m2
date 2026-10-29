@@ -99,7 +99,7 @@ catalog and stock list) instead of guessing, and the panel shows each step.
 | Server Action | `lib/copper/assistant/ask.ts` | `askCopper()` streams the question and returns a live `Progress` |
 | Tools | `lib/copper/assistant/tools.ts` | `get_products`, `get_prices`, `calculate_cost`, `check_availability` |
 | Instructions | `lib/copper/assistant/instructions.ts` | Copper's system prompt, sent only when tools are on |
-| Data | `lib/copper/data/inventory.json` | Stock list, read fresh by `readInventory()` |
+| Data | Supabase `inventory` table (`supabase/migrations/20261029000000_inventory.sql`) | Stock list, read fresh by `readInventory()`; it returns `null` when stock can't be read |
 | AI calls | `lib/ai/call.ts` (module 2, `ask-copper`) | `callStream`, with thought summaries; up to 5 steps with tools |
 
 **Data flow:** shopper question → panel → `askCopper()` → `callStream` → model
